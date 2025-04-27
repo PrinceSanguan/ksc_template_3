@@ -4,19 +4,42 @@ import { Link } from "@inertiajs/react"
 import { useEffect, useRef, useState } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import AnimatedElement from "@/components/ui/animated-element"
+import { useWindowScroll } from "@/hooks/useWindowScroll"
+import { useMediaQuery } from "@/hooks/useMediaQuery"
+import { cn } from "@/lib/utils"
+import { motion, AnimatePresence } from "framer-motion"
 
-const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isAboutDropdownOpen, setIsAboutDropdownOpen] = useState(false)
-  const [isContactDropdownOpen, setIsContactDropdownOpen] = useState(false)
-  const [isMainContactDropdownOpen, setIsMainContactDropdownOpen] = useState(false)
-  const [isProgramsDropdownOpen, setIsProgramsDropdownOpen] = useState(false)
-  const [isSuccessStoriesDropdownOpen, setIsSuccessStoriesDropdownOpen] = useState(false)
+type NavbarProps = {
+  transparent?: boolean
+}
+
+const Navbar = ({ transparent = false }: NavbarProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const scrollY = useWindowScroll()
+  const isScrolled = scrollY > 10
+  const isMobile = useMediaQuery("(max-width: 1023px)")
   const navbarRef = useRef<HTMLElement>(null)
   const navbarBgRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLDivElement>(null)
-  const particlesRef = useRef<HTMLDivElement>(null)
+
+  // Close mobile menu when switching to desktop
+  useEffect(() => {
+    if (!isMobile && isOpen) {
+      setIsOpen(false)
+    }
+  }, [isMobile, isOpen])
+
+  // Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+    return () => {
+      document.body.style.overflow = "auto"
+    }
+  }, [isOpen])
 
   useEffect(() => {
     // Register GSAP plugins
@@ -45,32 +68,23 @@ const Navbar = () => {
           ease: "back.out(1.7)",
         },
       )
-
-      // Subtle pulse effect for the logo
-      gsap.to(logoRef.current, {
-        filter: "drop-shadow(0 0 8px rgba(220, 38, 38, 0.5))",
-        repeat: -1,
-        yoyo: true,
-        duration: 2,
-        ease: "sine.inOut",
-      })
     }
 
     // Navbar scroll animation with enhanced styling
     const handleScroll = () => {
       if (window.scrollY > 50) {
         gsap.to(navbarBgRef.current, {
-          backgroundColor: "rgba(0, 0, 0, 0.95)",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
           backdropFilter: "blur(10px)",
-          borderBottom: "1px solid rgba(220, 38, 38, 0.3)",
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(220, 38, 38, 0.2)",
+          borderBottom: "1px solid rgba(226, 232, 240, 1)",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
           duration: 0.3,
         })
       } else {
         gsap.to(navbarBgRef.current, {
-          backgroundColor: "rgba(0, 0, 0, 0.9)",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
           backdropFilter: "blur(5px)",
-          borderBottom: "1px solid rgba(220, 38, 38, 0.1)",
+          borderBottom: "1px solid rgba(226, 232, 240, 0.5)",
           boxShadow: "none",
           duration: 0.3,
         })
@@ -80,46 +94,8 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll)
     handleScroll() // Initial call
 
-    // Create fire particles
-    if (particlesRef.current) {
-      const particles = particlesRef.current
-      const colors = ["#ff4b4b", "#ff8c42", "#ffdc5e", "#ff6b6b", "#ff3333"]
-      const particleInterval = setInterval(() => {
-        const particle = document.createElement("div")
-        const size = Math.random() * 4 + 1 // Smaller particles for navbar
-        const color = colors[Math.floor(Math.random() * colors.length)]
-
-        particle.style.position = "absolute"
-        particle.style.width = `${size}px`
-        particle.style.height = `${size}px`
-        particle.style.borderRadius = "50%"
-        particle.style.backgroundColor = color
-        particle.style.opacity = "0.4"
-        particle.style.left = `${Math.random() * 100}%`
-        particle.style.bottom = "0"
-
-        particles.appendChild(particle)
-
-        gsap.to(particle, {
-          x: Math.random() * 30 - 15,
-          y: -(Math.random() * 30 + 10), // Shorter rise for navbar
-          opacity: 0,
-          duration: 2 + Math.random() * 1, // Faster animation
-          ease: "power1.out",
-          onComplete: () => {
-            if (particles.contains(particle)) {
-              particles.removeChild(particle)
-            }
-          },
-        })
-      }, 300)
-
       return () => {
         window.removeEventListener("scroll", handleScroll)
-        if (particleInterval) {
-          clearInterval(particleInterval)
-        }
-      }
     }
   }, [])
 
@@ -131,16 +107,16 @@ const Navbar = () => {
       .nav-dropdown {
         position: relative;
       }
-      
+
       .nav-dropdown-menu {
         position: absolute;
         left: 0;
         top: 100%;
         min-width: 200px;
-        background-color: rgba(0, 0, 0, 0.95);
-        border: 1px solid rgba(220, 38, 38, 0.3);
-        border-radius: 4px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(220, 38, 38, 0.2);
+        background-color: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(226, 232, 240, 1);
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(10px);
         opacity: 0;
         visibility: hidden;
@@ -149,55 +125,44 @@ const Navbar = () => {
         z-index: 50;
         padding: 4px 0;
       }
-      
+
       .nav-dropdown:hover .nav-dropdown-menu {
         opacity: 1;
         visibility: visible;
         transform: translateY(0);
       }
-      
-      /* Delay hiding the dropdown to give users time to move to it */
-      .nav-dropdown .nav-dropdown-menu {
-        transition-delay: 0s;
-      }
-      
-      .nav-dropdown:hover .nav-dropdown-menu {
-        transition-delay: 0s;
-      }
-      
-      .nav-dropdown-menu:hover {
-        transition-delay: 0s;
-      }
-      
+
       /* Dropdown item styles */
       .dropdown-item {
         display: block;
-        padding: 8px 16px;
-        color: white;
-        font-size: 14px;
+        padding: 10px 16px;
+        color: #374151;
+        font-size: 0.9rem;
+        font-weight: 500;
+        font-family: 'Raleway', sans-serif;
         transition: all 0.2s ease;
         position: relative;
       }
-      
+
       .dropdown-item:hover {
-        background-color: rgba(220, 38, 38, 0.2);
-        color: #f87171;
+        background-color: rgba(243, 244, 246, 0.8);
+        color: #4B5563;
       }
-      
+
       /* Nested dropdown styles */
       .nested-dropdown {
         position: relative;
       }
-      
+
       .nested-dropdown-menu {
         position: absolute;
         left: 100%;
         top: 0;
         min-width: 180px;
-        background-color: rgba(0, 0, 0, 0.95);
-        border: 1px solid rgba(220, 38, 38, 0.3);
-        border-radius: 4px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 15px rgba(220, 38, 38, 0.2);
+        background-color: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(226, 232, 240, 1);
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(10px);
         opacity: 0;
         visibility: hidden;
@@ -206,55 +171,35 @@ const Navbar = () => {
         z-index: 51;
         padding: 4px 0;
       }
-      
+
       .nested-dropdown:hover .nested-dropdown-menu {
         opacity: 1;
         visibility: visible;
         transform: translateX(0);
       }
-      
+
       /* Animated underline effect for nav items */
       .nav-link {
         position: relative;
+        font-family: 'Raleway', sans-serif;
+        font-weight: 500;
       }
-      
+
       .nav-link::after {
         content: '';
         position: absolute;
         width: 0;
         height: 2px;
-        bottom: 0;
+        bottom: -2px;
         left: 50%;
-        background: linear-gradient(to right, #dc2626, #ef4444);
+        background: linear-gradient(to right, #2563EB, #4F46E5);
         transition: all 0.3s ease;
         transform: translateX(-50%);
         border-radius: 2px;
       }
-      
+
       .nav-link:hover::after {
         width: 70%;
-      }
-      
-      /* Arrow indicator for dropdowns */
-      .dropdown-arrow {
-        margin-left: 4px;
-        transition: transform 0.2s ease;
-      }
-      
-      .nav-dropdown:hover .dropdown-arrow {
-        transform: rotate(180deg);
-      }
-      
-      .nested-dropdown .nested-arrow {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        transition: transform 0.2s ease;
-      }
-      
-      .nested-dropdown:hover .nested-arrow {
-        transform: translateY(-50%) rotate(-90deg);
       }
     `
     document.head.appendChild(style)
@@ -265,457 +210,157 @@ const Navbar = () => {
   }, [])
 
   return (
-    <nav ref={navbarRef} className="fixed top-0 left-0 right-0 w-full z-50">
-      {/* Red top border */}
-      <div className="h-1 bg-gradient-to-r from-red-800 via-red-600 to-red-800"></div>
-
-      {/* Main navbar */}
-      <div ref={navbarBgRef} className="bg-black bg-opacity-90 backdrop-blur-sm border-b border-red-900/20">
-        {/* Particle effect container - positioned to not interfere with content */}
-        <div
-          ref={particlesRef}
-          className="absolute inset-x-0 bottom-0 h-8 pointer-events-none overflow-hidden opacity-50"
-        ></div>
-
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex-shrink-0">
-              <div ref={logoRef} className="flex items-center">
-                {/* Logo emblem */}
-                <div className="mr-2 w-8 h-8 rounded-full bg-gradient-to-br from-red-700 to-red-900 flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-xs">SKC</span>
-                </div>
-
-                <AnimatedElement type="fadeIn" delay={0.1} scrollTrigger={false}>
-                  <span className="text-xl font-bold">
-                    <span className="text-red-600">Seigler's</span>
-                    <span className="text-white"> Karate</span>
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-400">
-                      {" "}
-                      Center
-                    </span>
-                  </span>
-                </AnimatedElement>
-              </div>
-            </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-center space-x-6">
-                <AnimatedElement as="div" type="fadeInDown" delay={0.2} scrollTrigger={false}>
-                  <Link
-                    href="/"
-                    className="nav-link rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 transition-colors"
-                  >
-                    Home
-                  </Link>
-                </AnimatedElement>
-
-                {/* About Us Dropdown - Updated */}
-                <AnimatedElement as="div" type="fadeInDown" delay={0.3} scrollTrigger={false}>
-                  <div className="nav-dropdown">
-                    <Link
-                      href="/about"
-                      className="nav-link rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 transition-colors flex items-center"
-                    >
-                      About Us
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1 dropdown-arrow"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Link>
-                    <div className="nav-dropdown-menu">
-                      <Link href="/about/team" className="dropdown-item">
-                        Our Team
-                      </Link>
-                      <Link href="/about/blog" className="dropdown-item">
-                        Blog
-                      </Link>
-                      <div className="nested-dropdown">
-                        <Link href="/contact" className="dropdown-item flex justify-between items-center">
-                          <span>Contact</span>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 nested-arrow"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </Link>
-                        <div className="nested-dropdown-menu">
-                          <Link href="/locations/evans" className="dropdown-item">
-                            Evans, GA
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className={cn(
+        "fixed top-0 left-0 right-0 z-40 w-full",
+        isScrolled
+          ? "bg-white shadow-sm dark:bg-gray-900 transition-all duration-300 ease-in-out"
+          : transparent
+          ? "bg-transparent"
+          : "bg-white/95 backdrop-blur-sm dark:bg-gray-900/95"
+      )}
+    >
+      <div className="container mx-auto px-4 py-3 md:py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            href="/"
+            className={cn(
+              "flex items-center space-x-2",
+              isScrolled ? "py-2" : "py-3",
+              "transition-all duration-300 ease-in-out"
+            )}
+          >
+            <span className="text-xl font-bold tracking-tight">
+              <span className="text-black dark:text-white">Seigler's</span>{" "}
+              <span className="text-red-600 dark:text-red-500">Karate Center</span>
+            </span>
                           </Link>
-                          <Link href="/locations/grovetown" className="dropdown-item">
-                            Grovetown, GA
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </AnimatedElement>
 
-                {/* Programs Dropdown */}
-                <AnimatedElement as="div" type="fadeInDown" delay={0.4} scrollTrigger={false}>
-                  <div className="nav-dropdown">
-                    <Link
-                      href="/programs"
-                      className="nav-link rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 transition-colors flex items-center"
-                    >
-                      Programs
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1 dropdown-arrow"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Link>
-                    <div className="nav-dropdown-menu w-60">
-                      <Link href="/programs/lil-dragons" className="dropdown-item">
-                        Lil Dragons (4 — 5)
-                      </Link>
-                      <Link href="/programs/kids-karate" className="dropdown-item">
-                        Kids Karate (6 — 10)
-                      </Link>
-                      <Link href="/programs/teens-karate" className="dropdown-item">
-                        Teens Karate (11 — 13)
-                      </Link>
-                      <Link href="/programs/adult-kempo" className="dropdown-item">
-                        Adult Kempo Karate (14+)
-                      </Link>
-                      <Link href="/programs/kickboxing" className="dropdown-item">
-                        Kickboxing (14+)
-                      </Link>
-                      <Link href="/programs/jiu-jitsu" className="dropdown-item">
-                        Jiu Jitsu (14+)
-                      </Link>
-                    </div>
-                  </div>
-                </AnimatedElement>
-
-                {/* Success Stories Dropdown */}
-                <AnimatedElement as="div" type="fadeInDown" delay={0.5} scrollTrigger={false}>
-                  <div className="nav-dropdown">
-                    <Link
-                      href="/success-stories"
-                      className="nav-link rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 transition-colors flex items-center"
-                    >
-                      Success Stories
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1 dropdown-arrow"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Link>
-                    <div className="nav-dropdown-menu">
-                      <Link href="/success-stories/written-reviews" className="dropdown-item">
-                        Written Reviews
-                      </Link>
-                      <Link href="/success-stories/video-testimonials" className="dropdown-item">
-                        Video Testimonials
-                      </Link>
-                    </div>
-                  </div>
-                </AnimatedElement>
-
-                <AnimatedElement as="div" type="fadeInDown" delay={0.6} scrollTrigger={false}>
-                  <Link
-                    href="/franchise"
-                    className="nav-link rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 transition-colors"
-                  >
-                    Franchise Info
-                  </Link>
-                </AnimatedElement>
-
-                {/* Location Dropdown */}
-                <AnimatedElement as="div" type="fadeInDown" delay={0.7} scrollTrigger={false}>
-                  <div className="nav-dropdown">
-                    <Link
-                      href="/contact"
-                      className="rounded-md bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 px-3 py-2 text-sm font-medium text-white transition-all duration-300 shadow-[0_4px_10px_rgba(220,38,38,0.3)] hover:shadow-[0_6px_15px_rgba(220,38,38,0.4)] flex items-center"
-                    >
-                      Select Location
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 ml-1 dropdown-arrow"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </Link>
-                    <div className="nav-dropdown-menu right-0 left-auto">
-                      <Link href="/locations/evans" className="dropdown-item">
-                        Evans, GA
-                      </Link>
-                      <Link href="/locations/grovetown" className="dropdown-item">
-                        Grovetown, GA
-                      </Link>
-                    </div>
-                  </div>
-                </AnimatedElement>
-              </div>
-            </div>
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 transition-colors"
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex lg:items-center lg:space-x-8">
+            {[
+              { name: "About", href: "#about" },
+              { name: "Programs", href: "#programs" },
+              { name: "Community", href: "#community" },
+              { name: "Blog", href: "#blog" },
+              { name: "Contact", href: "#contact" },
+            ].map((item) => (
+              <a
+                key={item.name}
+                href={item.href}
+                className="group relative px-1 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 animate-border-bottom"
               >
-                <span className="sr-only">{isMenuOpen ? "Close main menu" : "Open main menu"}</span>
-                <svg
-                  className="h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  aria-hidden="true"
-                >
-                  {isMenuOpen ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                {item.name}
+              </a>
+            ))}
+          </nav>
+
+          {/* CTA Button */}
+          <div className="hidden lg:block">
+                    <Link
+              href="#book"
+              className="btn-sleek inline-flex items-center rounded-md bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:hover:bg-red-600 dark:focus:ring-red-400"
+            >
+              Book a Class
+                      </Link>
+                    </div>
+
+          {/* Mobile Menu Button */}
+          <div className="flex lg:hidden">
+            <button
+              type="button"
+              onClick={() => setIsOpen(!isOpen)}
+              className="group inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 dark:text-gray-300 dark:hover:bg-gray-800"
+              aria-expanded="false"
+            >
+              <span className="sr-only">Open main menu</span>
+              <div className="relative h-6 w-6">
+                <span
+                  className={cn(
+                    "absolute block h-0.5 rotate-0 transform rounded-full bg-current transition-all duration-300 ease-in-out",
+                    isOpen ? "top-2.5 w-5 -rotate-45" : "top-1.5 w-6"
                   )}
-                </svg>
+                />
+                <span
+                  className={cn(
+                    "absolute top-3 block h-0.5 w-6 rounded-full bg-current transition-all duration-300 ease-in-out",
+                    isOpen ? "opacity-0" : "opacity-100"
+                  )}
+                />
+                <span
+                  className={cn(
+                    "absolute block h-0.5 rotate-0 transform rounded-full bg-current transition-all duration-300 ease-in-out",
+                    isOpen ? "top-2.5 w-5 rotate-45" : "top-4.5 w-6"
+                  )}
+                />
+              </div>
               </button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-black/95 backdrop-blur-md border-b border-red-900/20 shadow-lg">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/"
-              className="block rounded-md px-3 py-2 text-base font-medium text-white hover:text-red-400 hover:bg-red-900/20 transition-colors"
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "100vh" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-30 flex flex-col overflow-hidden bg-white pt-16 dark:bg-gray-900 lg:hidden"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="flex-1 overflow-y-auto px-4 py-6"
             >
-              Home
-            </Link>
-            <div>
-              <button
-                onClick={() => setIsAboutDropdownOpen(!isAboutDropdownOpen)}
-                className="flex justify-between w-full rounded-md px-3 py-2 text-base font-medium text-white hover:text-red-400 hover:bg-red-900/20 transition-colors"
+              <nav className="flex flex-col space-y-6">
+                {[
+                  { name: "About", href: "#about" },
+                  { name: "Programs", href: "#programs" },
+                  { name: "Community", href: "#community" },
+                  { name: "Blog", href: "#blog" },
+                  { name: "Contact", href: "#contact" },
+                ].map((item, index) => (
+                  <motion.a
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * index, duration: 0.5 }}
+                    className="text-xl font-medium text-gray-800 transition-colors hover:text-red-600 dark:text-gray-200 dark:hover:text-red-500"
+                  >
+                    {item.name}
+                  </motion.a>
+                ))}
+              </nav>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="mt-10 flex items-center justify-center"
               >
-                <span>About Us</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transition-transform duration-300 ${isAboutDropdownOpen ? "transform rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+                <Link
+                  href="#book"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full rounded-md bg-red-600 px-5 py-3 text-center text-base font-medium text-white shadow-sm transition-all hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:hover:bg-red-600 dark:focus:ring-red-400"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {isAboutDropdownOpen && (
-                <div className="pl-4 space-y-1 mt-1 border-l border-red-900/20 ml-3">
-                  <Link
-                    href="/about"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    About Us Home
+            Book a Class
                   </Link>
-                  <Link
-                    href="/about/team"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Our Team
-                  </Link>
-                  <Link
-                    href="/about/blog"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Blog
-                  </Link>
-                  <div>
-                    <button
-                      onClick={() => setIsContactDropdownOpen(!isContactDropdownOpen)}
-                      className="flex justify-between w-full rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                    >
-                      <span>Contact</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className={`h-4 w-4 transition-transform duration-300 ${isContactDropdownOpen ? "transform rotate-180" : ""}`}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    {isContactDropdownOpen && (
-                      <div className="pl-4 space-y-1 mt-1 border-l border-red-900/20 ml-3">
-                        <Link
-                          href="/locations/evans"
-                          className="block rounded-md px-3 py-2 text-xs font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                        >
-                          Evans, GA
-                        </Link>
-                        <Link
-                          href="/locations/grovetown"
-                          className="block rounded-md px-3 py-2 text-xs font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                        >
-                          Grovetown, GA
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div>
-              <button
-                onClick={() => setIsProgramsDropdownOpen(!isProgramsDropdownOpen)}
-                className="flex justify-between w-full rounded-md px-3 py-2 text-base font-medium text-white hover:text-red-400 hover:bg-red-900/20 transition-colors"
-              >
-                <span>Programs</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transition-transform duration-300 ${isProgramsDropdownOpen ? "transform rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {isProgramsDropdownOpen && (
-                <div className="pl-4 space-y-1 mt-1 border-l border-red-900/20 ml-3">
-                  <Link
-                    href="/programs/lil-dragons"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Lil Dragons (4 — 5)
-                  </Link>
-                  <Link
-                    href="/programs/kids-karate"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Kids Karate (6 — 10)
-                  </Link>
-                  <Link
-                    href="/programs/teens-karate"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Teens Karate (11 — 13)
-                  </Link>
-                  <Link
-                    href="/programs/adult-kempo"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Adult Kempo Karate (14+)
-                  </Link>
-                  <Link
-                    href="/programs/kickboxing"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Kickboxing (14+)
-                  </Link>
-                  <Link
-                    href="/programs/jiu-jitsu"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Jiu Jitsu (14+)
-                  </Link>
-                </div>
-              )}
-            </div>
-            <div>
-              <button
-                onClick={() => setIsSuccessStoriesDropdownOpen(!isSuccessStoriesDropdownOpen)}
-                className="flex justify-between w-full rounded-md px-3 py-2 text-base font-medium text-white hover:text-red-400 hover:bg-red-900/20 transition-colors"
-              >
-                <span>Success Stories</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transition-transform duration-300 ${isSuccessStoriesDropdownOpen ? "transform rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {isSuccessStoriesDropdownOpen && (
-                <div className="pl-4 space-y-1 mt-1 border-l border-red-900/20 ml-3">
-                  <Link
-                    href="/success-stories"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    All Success Stories
-                  </Link>
-                  <Link
-                    href="/success-stories/written-reviews"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Written Reviews
-                  </Link>
-                  <Link
-                    href="/success-stories/video-testimonials"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Video Testimonials
-                  </Link>
-                </div>
-              )}
-            </div>
-            <Link
-              href="/franchise"
-              className="block rounded-md px-3 py-2 text-base font-medium text-white hover:text-red-400 hover:bg-red-900/20 transition-colors"
-            >
-              Franchise Info
-            </Link>
-            <div>
-              <button
-                onClick={() => setIsMainContactDropdownOpen(!isMainContactDropdownOpen)}
-                className="flex justify-between w-full rounded-md px-3 py-2 text-base font-medium text-white bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 mt-4 transition-colors"
-              >
-                <span>Select Location</span>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={`h-5 w-5 transition-transform duration-300 ${isMainContactDropdownOpen ? "transform rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              {isMainContactDropdownOpen && (
-                <div className="pl-4 space-y-1 mt-1 border-l border-red-900/20 ml-3">
-                  <Link
-                    href="/locations/evans"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Evans, GA
-                  </Link>
-                  <Link
-                    href="/locations/grovetown"
-                    className="block rounded-md px-3 py-2 text-sm font-medium text-white hover:text-red-400 hover:bg-red-900/10 transition-colors"
-                  >
-                    Grovetown, GA
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   )
 }
 

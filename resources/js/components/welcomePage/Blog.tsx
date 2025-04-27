@@ -141,8 +141,8 @@ const Blog = () => {
             <span className="text-red-400 uppercase tracking-wider text-sm font-semibold">Insights & Tips</span>
             <div className="h-px w-8 bg-red-500"></div>
           </div>
-          <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">Latest from Our Blog</h2>
-          <p className="mx-auto max-w-2xl text-gray-300 mt-4">
+          <h2 className="mb-4 text-4xl font-bold text-red-500 md:text-5xl">Latest from Our Blog</h2>
+          <p className="mx-auto max-w-2xl text-red-400 mt-4">
             Insights, tips, and stories from our martial arts community. Stay informed with the latest trends and
             techniques.
           </p>

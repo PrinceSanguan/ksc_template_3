@@ -24,11 +24,12 @@ export default function Welcome() {
         <>
             <Head title="Seigler's Karate Center">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
-                <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+                <link href="https://fonts.bunny.net/css?family=raleway:300,400,500,600,700|playfair-display:400,500,600,700&display=swap" rel="stylesheet" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             </Head>
 
             <MartialArtsBackground>
-                <div className="flex min-h-screen flex-col text-white">
+                <div className="flex min-h-screen flex-col text-gray-800">
                     <Navbar />
                     <Hero />
                     <About />

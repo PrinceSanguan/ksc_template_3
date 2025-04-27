@@ -51,12 +51,12 @@ const Feedback = () => {
       );
     }
 
-    // Create subtle fire particles
+    // Create subtle red particles
     if (particles) {
-      const colors = ["#ff9500", "#ff6a00", "#ff4d00", "#ff8800"];
+      const colors = ["#ff0000", "#ff3333", "#cc0000"];
       const particleInterval = setInterval(() => {
         const particle = document.createElement('div');
-        const size = Math.random() * 4 + 1; // Smaller particles
+        const size = Math.random() * 3 + 1;
         const color = colors[Math.floor(Math.random() * colors.length)];
 
         particle.style.position = 'absolute';
@@ -64,16 +64,15 @@ const Feedback = () => {
         particle.style.height = `${size}px`;
         particle.style.borderRadius = '50%';
         particle.style.backgroundColor = color;
-        particle.style.opacity = (0.2 + Math.random() * 0.2).toString(); // Lower opacity
+        particle.style.opacity = (0.1 + Math.random() * 0.1).toString();
         particle.style.left = `${Math.random() * 100}%`;
         particle.style.bottom = '0';
 
         particles.appendChild(particle);
 
-        // Gentle upward movement
         gsap.to(particle, {
-          x: Math.random() * 30 - 15, // Less horizontal movement
-          y: -(Math.random() * 100 + 50), // Less height
+          x: Math.random() * 30 - 15,
+          y: -(Math.random() * 100 + 50),
           opacity: 0,
           duration: 3 + Math.random() * 2,
           ease: "power1.out",
@@ -118,72 +117,77 @@ const Feedback = () => {
   ];
 
   return (
-    <section ref={sectionRef} id="feedback" className="relative py-20 text-white overflow-hidden">
+    <section ref={sectionRef} id="feedback" className="relative py-20 overflow-hidden bg-white">
       {/* Subtle particles container */}
-      <div ref={particlesRef} className="absolute inset-0 pointer-events-none z-5"></div>
+      <div ref={particlesRef} className="absolute inset-0 pointer-events-none z-0"></div>
 
-      <div className="container relative mx-auto px-4 z-20">
-        <div className="title-container mb-16 text-center">
-          <div className="inline-flex items-center space-x-2 mb-4">
-            <div className="h-px w-8 bg-red-500"></div>
-            <span className="text-red-400 uppercase tracking-wider text-sm font-semibold">Testimonials</span>
-            <div className="h-px w-8 bg-red-500"></div>
+      <div className="container mx-auto px-4 z-10 relative">
+        <div className="title-container mb-10 text-center">
+          {/* Title with red bracket styling */}
+          <div className="inline-block relative mb-6">
+            <div className="absolute left-0 top-0 w-10 h-10 border-t-2 border-l-2 border-red-600"></div>
+            <div className="absolute right-0 top-0 w-10 h-10 border-t-2 border-r-2 border-red-600"></div>
+            <div className="absolute left-0 bottom-0 w-10 h-10 border-b-2 border-l-2 border-red-600"></div>
+            <div className="absolute right-0 bottom-0 w-10 h-10 border-b-2 border-r-2 border-red-600"></div>
+            <h2 className="text-4xl md:text-5xl font-bold px-12 py-4">
+              What Our <span className="text-red-600 relative">Members<span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600"></span></span> Say
+            </h2>
           </div>
-          <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">What Our Members Say</h2>
-          <p className="mx-auto max-w-2xl text-gray-300 mt-4">
+
+          <p className="text-gray-700 mx-auto max-w-2xl mt-4">
             Hear from our community about their experiences and transformations at Seigler's Karate Center
           </p>
-          <div className="mx-auto mt-6 h-1 w-20 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>
         </div>
 
-        <div ref={cardsRef} className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="testimonial-card rounded-xl bg-black/60 p-6 shadow-xl transition-all duration-300 backdrop-blur-sm border border-red-900/20 hover:border-red-600/40 hover:shadow-red-900/5 group"
+              className="testimonial-card bg-red-50/80 shadow-md border border-red-100 overflow-hidden relative flex flex-col h-64"
             >
-              <div className="mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg
-                    key={i}
-                    className="mr-1 inline-block h-5 w-5 text-red-500 group-hover:text-yellow-400 transition-colors duration-300"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
+              {/* Red corner accent */}
+              <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-red-600 transform rotate-45 translate-x-16 -translate-y-16"></div>
               </div>
 
-              <p className="mb-6 text-gray-300">"{testimonial.content}"</p>
+              <div className="p-4 flex flex-col h-full">
+                {/* Star rating */}
+                <div className="flex mb-2">
+                  {[...Array(5)].map((_, i) => (
+                    <svg
+                      key={i}
+                      className="mr-1 inline-block h-4 w-4 text-red-600"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
 
-              <div className="flex items-center">
-                <div className="mr-4 h-12 w-12 overflow-hidden rounded-full border-2 border-red-500 group-hover:border-red-400 transition-colors duration-300">
+                {/* Testimonial content */}
+                <div className="flex-grow overflow-hidden">
+                  <div className="border-l-2 border-red-600 pl-2 mb-2">
+                    <p className="text-xs text-gray-800 line-clamp-6 italic">"{testimonial.content}"</p>
+                  </div>
+                </div>
+
+                {/* Author info */}
+                <div className="flex items-center mt-auto pt-2 border-t border-red-200">
                   <img
                     src={testimonial.avatar || "/placeholder.svg"}
                     alt={testimonial.name}
-                    className="h-full w-full object-cover"
+                    className="h-8 w-8 object-cover rounded-full border border-red-600"
                   />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-white">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-400">{testimonial.position}</p>
+                  <div className="ml-2">
+                    <div className="font-bold text-black text-xs">{testimonial.name}</div>
+                    <div className="text-red-600 text-xs">{testimonial.position}</div>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-16 text-center">
-          <button className="rounded-xl bg-gradient-to-r from-red-700 to-red-600 px-8 py-4 text-white hover:from-red-600 hover:to-red-500 transition-all duration-300 shadow-lg shadow-red-900/20 transform hover:scale-105 relative group overflow-hidden">
-            <span className="relative z-10 flex items-center justify-center">
-              See More Reviews
-              <svg className="w-5 h-5 ml-2 transform transition-transform duration-300 group-hover:translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </span>
-          </button>
         </div>
       </div>
     </section>
