@@ -4,28 +4,22 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const Feedback = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const section = sectionRef.current;
-    const particles = particlesRef.current;
-    const cards = cardsRef.current;
-
     // Title animation
-    if (section) {
+    if (sectionRef.current) {
       gsap.fromTo(
-        section.querySelector('.title-container'),
+        sectionRef.current.querySelector('.title-container'),
         { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power2.out",
           scrollTrigger: {
-            trigger: section,
+            trigger: sectionRef.current,
             start: 'top 80%',
           }
         }
@@ -33,62 +27,21 @@ const Feedback = () => {
     }
 
     // Cards animation
-    if (cards) {
+    if (cardsRef.current) {
       gsap.fromTo(
-        cards.querySelectorAll('.testimonial-card'),
+        cardsRef.current.querySelectorAll('.testimonial-item'),
         { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
-          stagger: 0.1,
-          duration: 0.6,
-          ease: "power2.out",
+          stagger: 0.2,
+          duration: 0.7,
           scrollTrigger: {
-            trigger: cards,
+            trigger: cardsRef.current,
             start: 'top 80%',
           }
         }
       );
-    }
-
-    // Create subtle red particles
-    if (particles) {
-      const colors = ["#ff0000", "#ff3333", "#cc0000"];
-      const particleInterval = setInterval(() => {
-        const particle = document.createElement('div');
-        const size = Math.random() * 3 + 1;
-        const color = colors[Math.floor(Math.random() * colors.length)];
-
-        particle.style.position = 'absolute';
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.borderRadius = '50%';
-        particle.style.backgroundColor = color;
-        particle.style.opacity = (0.1 + Math.random() * 0.1).toString();
-        particle.style.left = `${Math.random() * 100}%`;
-        particle.style.bottom = '0';
-
-        particles.appendChild(particle);
-
-        gsap.to(particle, {
-          x: Math.random() * 30 - 15,
-          y: -(Math.random() * 100 + 50),
-          opacity: 0,
-          duration: 3 + Math.random() * 2,
-          ease: "power1.out",
-          onComplete: () => {
-            if (particles.contains(particle)) {
-              particles.removeChild(particle);
-            }
-          }
-        });
-      }, 300);
-
-      return () => {
-        if (particleInterval) {
-          clearInterval(particleInterval);
-        }
-      };
     }
   }, []);
 
@@ -117,77 +70,113 @@ const Feedback = () => {
   ];
 
   return (
-    <section ref={sectionRef} id="feedback" className="relative py-20 overflow-hidden bg-white">
-      {/* Subtle particles container */}
-      <div ref={particlesRef} className="absolute inset-0 pointer-events-none z-0"></div>
-
-      <div className="container mx-auto px-4 z-10 relative">
-        <div className="title-container mb-10 text-center">
-          {/* Title with red bracket styling */}
-          <div className="inline-block relative mb-6">
-            <div className="absolute left-0 top-0 w-10 h-10 border-t-2 border-l-2 border-red-600"></div>
-            <div className="absolute right-0 top-0 w-10 h-10 border-t-2 border-r-2 border-red-600"></div>
-            <div className="absolute left-0 bottom-0 w-10 h-10 border-b-2 border-l-2 border-red-600"></div>
-            <div className="absolute right-0 bottom-0 w-10 h-10 border-b-2 border-r-2 border-red-600"></div>
-            <h2 className="text-4xl md:text-5xl font-bold px-12 py-4">
-              What Our <span className="text-red-600 relative">Members<span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600"></span></span> Say
-            </h2>
+    <section ref={sectionRef} id="feedback" className="py-16">
+      <div className="container mx-auto px-4">
+        {/* Simple title section */}
+        <div className="title-container mb-12 text-center max-w-3xl mx-auto">
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-px w-8 bg-red-500"></div>
+            <span className="text-red-500 uppercase tracking-wider text-sm font-semibold mx-3">Testimonials</span>
+            <div className="h-px w-8 bg-red-500"></div>
           </div>
-
-          <p className="text-gray-700 mx-auto max-w-2xl mt-4">
+          
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            What Our <span className="text-red-500">Members</span> Say
+          </h2>
+          
+          <p className="text-gray-600">
             Hear from our community about their experiences and transformations at Seigler's Karate Center
           </p>
         </div>
 
-        <div ref={cardsRef} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
+        {/* Featured testimonial */}
+        <div className="mb-12">
+          <div className="bg-white rounded-lg shadow-lg p-8 relative max-w-4xl mx-auto">
+            <div className="absolute top-0 left-0 transform -translate-x-3 -translate-y-3">
+              <svg className="w-12 h-12 text-red-500/20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
+              </svg>
+            </div>
+            
+            <div className="text-lg text-gray-700 italic mb-6 relative z-10">
+              "{testimonials[0].content}"
+            </div>
+            
+            <div className="flex items-center">
+              <img 
+                src={testimonials[0].avatar}
+                alt={testimonials[0].name}
+                className="w-12 h-12 rounded-full object-cover mr-4"
+              />
+              <div>
+                <div className="font-bold text-gray-900">{testimonials[0].name}</div>
+                <div className="text-red-500">{testimonials[0].position}</div>
+              </div>
+              <div className="ml-auto flex">
+                {[...Array(5)].map((_, i) => (
+                  <svg
+                    key={i}
+                    className="w-5 h-5 text-yellow-400 fill-current"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Testimonials list */}
+        <div ref={cardsRef} className="grid md:grid-cols-2 gap-6">
+          {testimonials.slice(1).map((testimonial) => (
             <div
               key={testimonial.id}
-              className="testimonial-card bg-red-50/80 shadow-md border border-red-100 overflow-hidden relative flex flex-col h-64"
+              className="testimonial-item group bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden flex flex-col"
             >
-              {/* Red corner accent */}
-              <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-red-600 transform rotate-45 translate-x-16 -translate-y-16"></div>
-              </div>
-
-              <div className="p-4 flex flex-col h-full">
-                {/* Star rating */}
-                <div className="flex mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <svg
-                      key={i}
-                      className="mr-1 inline-block h-4 w-4 text-red-600"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-
-                {/* Testimonial content */}
-                <div className="flex-grow overflow-hidden">
-                  <div className="border-l-2 border-red-600 pl-2 mb-2">
-                    <p className="text-xs text-gray-800 line-clamp-6 italic">"{testimonial.content}"</p>
+              <div className="p-6 flex flex-col h-full">
+                <div className="flex items-start mb-4">
+                  <div className="flex-shrink-0 mr-4">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover border-2 border-red-100 group-hover:border-red-300 transition-colors duration-300"
+                    />
+                  </div>
+                  
+                  <div>
+                    <div className="font-bold text-gray-900">{testimonial.name}</div>
+                    <div className="text-red-500 text-sm">{testimonial.position}</div>
+                    <div className="flex mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <svg
+                          key={i}
+                          className="w-4 h-4 text-yellow-400 fill-current"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                {/* Author info */}
-                <div className="flex items-center mt-auto pt-2 border-t border-red-200">
-                  <img
-                    src={testimonial.avatar || "/placeholder.svg"}
-                    alt={testimonial.name}
-                    className="h-8 w-8 object-cover rounded-full border border-red-600"
-                  />
-                  <div className="ml-2">
-                    <div className="font-bold text-black text-xs">{testimonial.name}</div>
-                    <div className="text-red-600 text-xs">{testimonial.position}</div>
-                  </div>
+                
+                <div className="relative pl-4 border-l-2 border-red-100 group-hover:border-red-300 transition-colors duration-300">
+                  <p className="text-gray-600 italic text-sm">"{testimonial.content}"</p>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+        
+        {/* Call to action */}
+        <div className="mt-12 text-center">
+          <a href="#" className="inline-flex items-center text-red-500 font-medium hover:text-red-600 transition-colors duration-300">
+            <span>View more testimonials</span>
+            <svg className="w-5 h-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>
