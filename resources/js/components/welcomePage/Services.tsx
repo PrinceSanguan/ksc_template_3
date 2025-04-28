@@ -5,51 +5,61 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 const Services = () => {
-  const sectionRef = useRef(null)
-  const cardsRef = useRef(null)
+  const sectionRef = useRef<HTMLElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+  const featuredRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
-    const section = sectionRef.current
-    const cards = cardsRef.current
-
-    // Title animation
-    if (section) {
+    // Simple fade-in animations
+    if (sectionRef.current) {
       gsap.fromTo(
-        section.querySelector(".title-container"),
+        sectionRef.current.querySelector(".title-container"),
         { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power2.out",
           scrollTrigger: {
-            trigger: section,
+            trigger: sectionRef.current,
             start: "top 80%",
           }
         }
       )
+      
+      if (featuredRef.current) {
+        gsap.fromTo(
+          featuredRef.current,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            delay: 0.2,
+            scrollTrigger: {
+              trigger: featuredRef.current,
+              start: "top 80%",
+            }
+          }
+        )
+      }
     }
 
     // Cards animation
-    if (cards) {
-      const programCards = cards.querySelectorAll(".program-card")
+    if (cardsRef.current) {
+      const programCards = cardsRef.current.querySelectorAll(".program-card")
 
       gsap.fromTo(
         programCards,
-        {
-          opacity: 0,
-          y: 30
-        },
+        { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
           stagger: 0.12,
           duration: 0.8,
-          ease: "back.out(1.2)",
           scrollTrigger: {
-            trigger: cards,
+            trigger: cardsRef.current,
             start: "top 80%",
           }
         }
@@ -139,91 +149,139 @@ const Services = () => {
   return (
     <section
       id="programs"
-      className="relative py-24 overflow-hidden bg-white"
+      className="py-16"
       ref={sectionRef}
     >
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 bg-neutral-50 bg-[radial-gradient(#e0e0e0_1px,transparent_1px)] bg-[size:20px_20px] opacity-50"></div>
-
-      {/* Red accent line */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-red-600"></div>
-
-      <div className="container relative mx-auto px-4 z-10">
-        <div className="title-container max-w-3xl mx-auto text-center mb-16">
-          {/* Header label */}
-          <div className="inline-block mb-4">
-            <span className="bg-red-600 text-white uppercase tracking-widest text-sm font-bold px-6 py-2 rounded-full">
-              OUR PROGRAMS
-            </span>
+      <div className="container mx-auto px-4">
+        {/* Title section */}
+        <div className="title-container max-w-3xl mx-auto mb-12">
+          <div className="flex items-center mb-4">
+            <div className="h-1 w-12 bg-red-500 rounded-full mr-4"></div>
+            <span className="text-red-500 uppercase tracking-wider text-sm font-semibold">Our Programs</span>
           </div>
-
-          {/* Main heading with clean typography */}
-          <h2 className="mb-6 text-4xl md:text-5xl font-bold text-neutral-900 tracking-tight">
-            Martial Arts Classes
+          
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Martial Arts Classes For All Ages
           </h2>
-
-          {/* Description with clean styling */}
-          <p className="text-neutral-600 text-lg max-w-2xl mx-auto leading-relaxed">
+          
+          <p className="text-gray-600 max-w-2xl">
             Discover the perfect martial arts program at SKC! Our diverse classes cater to all ages and skill levels,
             ensuring everyone finds their path to excellence.
           </p>
+        </div>
 
-          {/* Red divider */}
-          <div className="flex justify-center mt-8 mb-4">
-            <div className="h-px w-16 bg-red-600"></div>
+        {/* Featured program - New section */}
+        <div ref={featuredRef} className="mb-12">
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="flex flex-col lg:flex-row">
+              <div className="lg:w-1/2 relative">
+                <img 
+                  src={programs[0].image} 
+                  alt={programs[0].title}
+                  className="w-full h-full object-cover" 
+                />
+                <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-900 shadow-md">
+                  Ages {programs[0].ageRange}
+                </div>
+              </div>
+              
+              <div className="lg:w-1/2 p-8 flex flex-col justify-center">
+                <div className="inline-block bg-red-50 rounded-lg px-3 py-1 text-red-500 text-sm font-medium mb-4">
+                  Featured Program
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{programs[0].title}</h3>
+                
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 p-2 bg-red-500 text-white rounded-md">
+                    {programs[0].icon}
+                  </div>
+                  <p className="text-gray-600">
+                    {programs[0].description}
+                  </p>
+                </div>
+                
+                <ul className="mb-6 space-y-2">
+                  <li className="flex items-center text-gray-700">
+                    <svg className="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Build confidence and focus</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <svg className="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Develop coordination and balance</span>
+                  </li>
+                  <li className="flex items-center text-gray-700">
+                    <svg className="w-5 h-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Learn respect and discipline</span>
+                  </li>
+                </ul>
+                
+                <button className="bg-red-500 hover:bg-red-600 text-white font-medium px-6 py-3 rounded-lg inline-flex items-center transition-colors duration-300 self-start">
+                  View Program Details
+                  <svg
+                    className="w-5 h-5 ml-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div
-          ref={cardsRef}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
-        >
-          {programs.map((program) => (
-            <div
-              key={program.id}
-              className="program-card group relative overflow-hidden bg-white rounded-lg transition-all duration-300 hover:translate-y-[-8px] shadow-sm hover:shadow-md"
-            >
-              {/* Image with minimal overlay */}
-              <div className="relative h-56 overflow-hidden">
-                {/* Subtle gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/10 z-10"></div>
-
-                <img
-                  src={program.image || "/placeholder.svg"}
-                  alt={`${program.title} martial arts class`}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-
-                {/* Age badge */}
-                <div className="absolute top-4 right-4 z-30">
-                  <div className="bg-white text-neutral-900 text-xs font-medium px-3 py-1 rounded-full">
+        {/* Program cards in a different layout */}
+        <div className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-900">More Programs</h3>
+            <div className="text-sm text-gray-500">Browse by age group</div>
+          </div>
+          
+          <div
+            ref={cardsRef}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {programs.slice(1).map((program) => (
+              <div
+                key={program.id}
+                className="program-card bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden"
+              >
+                <div className="relative h-48">
+                  <img
+                    src={program.image}
+                    alt={program.title}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-t from-gray-900/70 to-transparent"></div>
+                  <div className="absolute top-3 right-3 bg-white rounded-full px-3 py-1 text-xs font-medium text-gray-900">
                     Ages {program.ageRange}
                   </div>
-                </div>
-
-                {/* Program title */}
-                <div className="absolute bottom-0 left-0 w-full p-4 z-20">
-                  <h3 className="text-2xl font-bold text-white">{program.title}</h3>
-                </div>
-              </div>
-
-              {/* Content area */}
-              <div className="p-6 border-t border-neutral-100">
-                <div className="mb-4 flex items-start gap-3">
-                  <div className="flex-shrink-0 p-2 bg-red-600 text-white rounded-md">
-                    {program.icon}
+                  <div className="absolute bottom-3 left-3">
+                    <h3 className="text-xl font-bold text-white">{program.title}</h3>
                   </div>
-                  <p className="text-neutral-600 text-sm leading-relaxed">
-                    {program.description}
-                  </p>
                 </div>
-
-                {/* CTA Button */}
-                <div className="mt-4 pt-4 border-t border-neutral-100">
-                  <button className="text-red-600 hover:text-red-700 font-medium text-sm flex items-center transition-all duration-300 group">
+                
+                <div className="p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="flex-shrink-0 p-2 bg-red-500 text-white rounded-md">
+                      {program.icon}
+                    </div>
+                    <p className="text-gray-600 text-sm">{program.description}</p>
+                  </div>
+                  
+                  <button className="text-red-500 hover:text-red-600 font-medium text-sm flex items-center transition-colors duration-300">
                     View Program Details
                     <svg
-                      className="w-4 h-4 ml-2 transform transition-transform duration-300 group-hover:translate-x-1"
+                      className="w-4 h-4 ml-2 transform group-hover:translate-x-1"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -234,37 +292,91 @@ const Services = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Bottom red accent */}
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-
+        
+        {/* Program selector - New tabbed navigation */}
+        <div className="my-12 bg-gray-50 rounded-lg p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-6 text-center">Find The Perfect Program</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+              <h4 className="font-bold text-lg text-gray-900 mb-4">Children</h4>
+              <ul className="space-y-3">
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Lil Dragons (Ages 4-5)</span>
+                </li>
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Kids Karate (Ages 6-10)</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+              <h4 className="font-bold text-lg text-gray-900 mb-4">Teens</h4>
+              <ul className="space-y-3">
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Teens Karate (Ages 11-13)</span>
+                </li>
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Teen Self-Defense</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
+              <h4 className="font-bold text-lg text-gray-900 mb-4">Adults</h4>
+              <ul className="space-y-3">
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Adult Kempo Karate (14+)</span>
+                </li>
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Kickboxing (14+)</span>
+                </li>
+                <li className="flex items-center text-gray-600 hover:text-red-500 transition-colors duration-300">
+                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                  <span>Jiu Jitsu (14+)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
         {/* CTA Section */}
-        <div className="text-center mt-16 max-w-3xl mx-auto">
-          <div className="bg-neutral-50 p-8 rounded-lg border border-neutral-200 mb-8">
-            <h3 className="text-neutral-900 text-xl font-semibold mb-3">Ready to Begin Your Martial Arts Journey?</h3>
-            <p className="text-neutral-600 mb-6">
+        <div className="text-center">
+          <div className="bg-white rounded-lg shadow-lg border border-gray-100 p-8 max-w-3xl mx-auto">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Ready to Begin Your Martial Arts Journey?</h3>
+            <p className="text-gray-600 mb-6">
               Join our community of martial artists and experience the transformative power of discipline,
               respect, and self-improvement. All skill levels welcome!
             </p>
-            <button className="bg-red-600 hover:bg-red-700 text-white font-medium px-8 py-3 rounded-md transition-all duration-300 flex items-center justify-center mx-auto">
+            <button className="bg-red-500 hover:bg-red-600 text-white font-medium px-8 py-3 rounded-lg transition-colors duration-300 flex items-center justify-center mx-auto">
               <span>Schedule Your Free Trial Class</span>
               <svg className="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </button>
-          </div>
-
-          {/* Classes for all ages badge */}
-          <div className="inline-flex items-center justify-center gap-3 py-3 px-6 bg-white rounded-full border border-neutral-200 shadow-sm">
-            <svg className="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 14.5C15.3137 14.5 18 11.8137 18 8.5C18 5.18629 15.3137 2.5 12 2.5C8.68629 2.5 6 5.18629 6 8.5C6 11.8137 8.68629 14.5 12 14.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16 21.5C16 19.8431 14.2091 18.5 12 18.5C9.79086 18.5 8 19.8431 8 21.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M20 16.95C20.0172 16.8025 20.0333 16.6522 20.0333 16.5C20.0333 14.0147 16.4153 12 12 12C7.58467 12 4 14.0147 4 16.5C4 16.6522 4.01601 16.8025 4.03333 16.95" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span className="text-neutral-800 font-medium">Classes For All Ages</span>
           </div>
         </div>
       </div>

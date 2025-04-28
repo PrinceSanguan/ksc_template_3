@@ -5,91 +5,40 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const Booking = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const particlesRef = useRef<HTMLDivElement>(null);
-
+  
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    const section = sectionRef.current;
-    const container = containerRef.current;
-    const particles = particlesRef.current;
-
-    // Title animation
-    if (section) {
+    // Simple fade-in animations
+    if (sectionRef.current) {
       gsap.fromTo(
-        section.querySelector('.title-container'),
+        sectionRef.current.querySelector('.title-container'),
         { opacity: 0, y: 20 },
         {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: "power2.out",
           scrollTrigger: {
-            trigger: section,
+            trigger: sectionRef.current,
             start: 'top 80%',
           }
         }
       );
-    }
-
-    // Container animation
-    if (container) {
+      
       gsap.fromTo(
-        container,
+        sectionRef.current.querySelector('.booking-container'),
         { opacity: 0, y: 30 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
-          ease: "power2.out",
+          duration: 0.8,
+          delay: 0.2,
           scrollTrigger: {
-            trigger: container,
-            start: 'top 80%',
+            trigger: sectionRef.current,
+            start: 'top 70%',
           }
         }
       );
-    }
-
-    // Create subtle fire particles
-    if (particles) {
-      const colors = ["#ff9500", "#ff6a00", "#ff4d00", "#ff8800"];
-      const particleInterval = setInterval(() => {
-        const particle = document.createElement('div');
-        const size = Math.random() * 4 + 1; // Smaller particles
-        const color = colors[Math.floor(Math.random() * colors.length)];
-
-        particle.style.position = 'absolute';
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        particle.style.borderRadius = '50%';
-        particle.style.backgroundColor = color;
-        particle.style.opacity = (0.2 + Math.random() * 0.2).toString(); // Lower opacity
-        particle.style.left = `${Math.random() * 100}%`;
-        particle.style.bottom = '0';
-
-        particles.appendChild(particle);
-
-        // Gentle upward movement
-        gsap.to(particle, {
-          x: Math.random() * 30 - 15, // Less horizontal movement
-          y: -(Math.random() * 100 + 50), // Less height
-          opacity: 0,
-          duration: 3 + Math.random() * 2,
-          ease: "power1.out",
-          onComplete: () => {
-            if (particles.contains(particle)) {
-              particles.removeChild(particle);
-            }
-          }
-        });
-      }, 300); // Less frequent particles
-
-      return () => {
-        if (particleInterval) {
-          clearInterval(particleInterval);
-        }
-      };
     }
   }, []);
 
@@ -125,101 +74,109 @@ const Booking = () => {
   ];
 
   return (
-    <section id="booking" ref={sectionRef} className="relative py-20 text-white overflow-hidden">
-      {/* Subtle particles container */}
-      <div ref={particlesRef} className="absolute inset-0 pointer-events-none z-5"></div>
-
-      <div className="container relative mx-auto px-4 z-10">
-        <div className="title-container mb-16 text-center">
+    <section id="booking" ref={sectionRef} className="py-16">
+      <div className="container mx-auto px-4">
+        {/* Title section */}
+        <div className="title-container text-center mb-12">
           <div className="inline-flex items-center space-x-2 mb-4">
             <div className="h-px w-8 bg-red-500"></div>
-            <span className="text-red-400 uppercase tracking-wider text-sm font-semibold">Join Us</span>
+            <span className="text-red-500 uppercase tracking-wider text-sm font-semibold">Join Us</span>
             <div className="h-px w-8 bg-red-500"></div>
           </div>
-          <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">Schedule & Pricing</h2>
-          <p className="mx-auto max-w-2xl text-gray-300 mt-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Schedule & Pricing</h2>
+          <p className="mx-auto max-w-2xl text-gray-600 mt-4">
             Get started with Seigler's Karate Center today. Select a program and schedule your first class.
           </p>
-          <div className="mx-auto mt-6 h-1 w-20 bg-gradient-to-r from-red-600 to-red-400 rounded-full"></div>
+          <div className="mx-auto mt-6 h-1 w-20 bg-red-500 rounded-full"></div>
         </div>
 
-        <div ref={containerRef} className="flex flex-col rounded-2xl shadow-xl lg:flex-row overflow-hidden border border-red-900/20">
-          <div className="w-full p-8 bg-black/60 backdrop-blur-sm lg:w-1/2 border-r border-red-900/20">
-            <h3 className="mb-6 text-2xl font-semibold text-white">Select a Program</h3>
-
-            <div className="space-y-4">
-              {services.map((service) => (
-                <div
-                  key={service.id}
-                  className="flex cursor-pointer items-center rounded-lg border border-red-900/20 p-4 transition-all hover:border-red-500/40 hover:shadow-md bg-black/40 group"
-                >
-                  <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-900/30 text-red-400 transition-all duration-300 group-hover:bg-red-800/40">
-                    <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-white group-hover:text-red-400 transition-colors duration-300">{service.name}</h4>
-                    <p className="text-sm text-gray-300">{service.description}</p>
-                  </div>
-                  <div className="ml-4 text-right">
-                    <span className="block font-semibold text-white">{service.price}</span>
-                    <span className="text-sm text-gray-400">{service.duration}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8">
-              <Button 
-                variant="default" 
-                className="w-full bg-gradient-to-r from-red-700 to-red-600 px-6 py-4 text-white hover:from-red-600 hover:to-red-500 transition-all duration-300 shadow-lg shadow-red-900/20 transform hover:scale-105 relative group overflow-hidden"
-              >
-                <span className="flex items-center justify-center">
-                  <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  View More Options
-                </span>
-              </Button>
-            </div>
-          </div>
-
-          <div className="relative w-full bg-black/80 backdrop-blur-sm p-8 text-white lg:w-1/2 lg:rounded-r-2xl">
-            <div className="absolute bottom-0 left-0 right-0 top-0 bg-gradient-to-br from-red-900/30 to-red-800/10 opacity-50 lg:rounded-r-2xl"></div>
-            <div className="relative z-10">
-              <h3 className="mb-6 text-2xl font-semibold">ONLINE EXCLUSIVE OFFER</h3>
-
-              <div className="mb-6 rounded-lg bg-red-900/20 border border-red-900/30 p-4 shadow-lg">
-                <div className="mb-2 text-center text-xl font-semibold">Limited Time & Availability</div>
-                <p className="text-center text-gray-300">Get more information about our classes and schedule on the next page!</p>
+        {/* Main booking container - New layout */}
+        <div className="booking-container max-w-5xl mx-auto">
+          {/* Featured program */}
+          <div className="bg-red-50 rounded-t-xl p-6 border-b border-red-100 text-center">
+            <span className="inline-block bg-red-500 text-white text-xs font-bold uppercase tracking-wider rounded-full px-3 py-1 mb-3">Most Popular</span>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Trial Class</h3>
+            <p className="text-gray-600 mb-4">Experience a martial arts class with no obligation to continue</p>
+            <div className="flex justify-center items-center gap-4 mb-4">
+              <div className="text-center">
+                <span className="block text-3xl font-bold text-red-500">FREE</span>
+                <span className="text-sm text-gray-500">No obligation</span>
               </div>
-
+              <div className="text-center">
+                <span className="block text-3xl font-bold text-red-500">45</span>
+                <span className="text-sm text-gray-500">Minutes</span>
+              </div>
+            </div>
+            <Button 
+              className="bg-red-500 hover:bg-red-600 text-white font-medium px-6 py-3 rounded-lg transition-colors duration-300"
+            >
+              Book Free Trial
+            </Button>
+          </div>
+          
+          {/* Programs and form in two columns */}
+          <div className="grid md:grid-cols-2 gap-0 border border-gray-200 rounded-b-xl overflow-hidden shadow-lg">
+            {/* Left column - Programs */}
+            <div className="p-6 bg-white">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Other Programs</h3>
+              
+              <div className="space-y-4">
+                {services.slice(1).map((service) => (
+                  <div
+                    key={service.id}
+                    className="flex items-center p-4 rounded-lg border border-gray-200 hover:border-red-200 hover:shadow-md transition-all duration-300 group cursor-pointer"
+                  >
+                    <div className="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-500 group-hover:bg-red-100 transition-colors duration-300">
+                      <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 group-hover:text-red-500 transition-colors duration-300">{service.name}</h4>
+                      <p className="text-sm text-gray-600">{service.description}</p>
+                    </div>
+                    <div className="ml-4 text-right">
+                      <span className="block font-semibold text-gray-900">{service.price}</span>
+                      <span className="text-sm text-gray-500">{service.duration}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Right column - Form */}
+            <div className="p-6 bg-gray-50 border-l border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">Get Information</h3>
+              
+              <div className="mb-6 bg-red-50 rounded-lg p-4 border border-red-100">
+                <div className="text-center font-medium text-gray-900 mb-1">Limited Time Offer</div>
+                <p className="text-center text-gray-600 text-sm">Sign up today and receive a free uniform with enrollment!</p>
+              </div>
+              
               <form className="space-y-4">
                 <div>
                   <input
                     type="text"
                     placeholder="Full Name"
-                    className="w-full rounded-md border border-red-900/30 bg-black/40 p-3 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
+                    className="w-full rounded-md border border-gray-300 p-3 text-gray-900 placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
                   />
                 </div>
                 <div>
                   <input
                     type="email"
-                    placeholder="Email address for info"
-                    className="w-full rounded-md border border-red-900/30 bg-black/40 p-3 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
+                    placeholder="Email address"
+                    className="w-full rounded-md border border-gray-300 p-3 text-gray-900 placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
                   />
                 </div>
                 <div>
                   <input
                     type="tel"
-                    placeholder="Mobile # for info via text"
-                    className="w-full rounded-md border border-red-900/30 bg-black/40 p-3 text-white placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
+                    placeholder="Phone Number"
+                    className="w-full rounded-md border border-gray-300 p-3 text-gray-900 placeholder-gray-400 focus:border-red-500 focus:ring-red-500"
                   />
                 </div>
                 <div>
-                  <select className="w-full rounded-md border border-red-900/30 bg-black/40 p-3 text-white focus:border-red-500 focus:ring-red-500">
+                  <select className="w-full rounded-md border border-gray-300 p-3 text-gray-900 focus:border-red-500 focus:ring-red-500">
                     <option value="">Select a Program</option>
                     <option value="lil-dragons">Lil Dragons (4-5)</option>
                     <option value="kids">Kids Karate (6-10)</option>
@@ -230,27 +187,24 @@ const Booking = () => {
                   </select>
                 </div>
                 <div>
-                  <select className="w-full rounded-md border border-red-900/30 bg-black/40 p-3 text-white focus:border-red-500 focus:ring-red-500">
+                  <select className="w-full rounded-md border border-gray-300 p-3 text-gray-900 focus:border-red-500 focus:ring-red-500">
                     <option value="">Select Location</option>
                     <option value="evans">Evans, GA</option>
                     <option value="grovetown">Grovetown, GA</option>
                     <option value="augusta">Augusta, GA (Coming Soon)</option>
                   </select>
                 </div>
+                
                 <Button 
-                  className="w-full bg-gradient-to-r from-red-700 to-red-600 py-4 font-medium text-white hover:from-red-600 hover:to-red-500 transition-all duration-300 shadow-lg shadow-red-900/20 transform hover:scale-105 relative group overflow-hidden"
+                  className="w-full bg-red-500 hover:bg-red-600 py-3 font-medium text-white transition-colors duration-300"
                 >
-                  <span className="flex items-center justify-center">
-                    <svg className="mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    Get Information
-                  </span>
+                  Get Information
                 </Button>
+                
+                <p className="text-xs text-gray-500 mt-2">
+                  By submitting this form, you agree to receive information about our programs. We respect your privacy and will never share your information.
+                </p>
               </form>
-              <p className="mt-4 text-xs text-gray-400">
-                By opting into the web form above you are providing consent for Seigler's Karate Center to send you periodic text messages. Standard rates may apply. You can reply HELP at anytime to learn more. You may opt-out anytime by replying STOP.
-              </p>
             </div>
           </div>
         </div>
